@@ -176,7 +176,7 @@ const getUnlistedFigs = async (req, res) => {
         }
       ],
       group: ['tblFig.id'],
-      order: [['createdAt', 'DESC']],
+      order: [['Name', 'ASC']],
       raw: true,
     });
     
@@ -246,6 +246,7 @@ const allFigsList = async (req,res)=>{
         "BlockName",
         "FigLeader",
         "FigLeaderContact",
+        "VillageName",
         [sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("tblFarmers.id"))), "farmerCount"],
         [sequelize.fn("MAX", sequelize.col("tblFpo.Status")),"FpoStatus"],
         [sequelize.fn("MAX", sequelize.col("tblFpo.SlaApprove")),"FpoSLaApprove"],

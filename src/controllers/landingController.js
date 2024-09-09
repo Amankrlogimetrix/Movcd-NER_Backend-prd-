@@ -12,6 +12,86 @@ const { authentication } = require("../middleware/middleware");
 
 const collectiveData = async (req, res) => {
   try {
+    // let {phaseWise ,StateName} = req.body
+    // console.log(phaseWise,"__phaseWise")
+    // if(phaseWise && phaseWise.length > 0 ){
+    //     return res.status(404).send({status:false,  message:"Phase Wise Data Not Found"})
+    // }
+    // let whereClause ={}
+    // if (StateName && StateName !== "All") {
+    //     whereClause.StateName = StateName;
+    // }
+
+    // const farmersWithFPO = await tblFarmer.findAll({
+    //     attributes: [
+    //         'StateName',
+    //         // StateName,
+    //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('DistrictName'))), 'districtCount'],
+    //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FarmerCode'))), 'farmerCount'],
+    //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('figId'))), 'figCount'],
+    //         [
+    //             sequelize.literal('(SELECT COUNT(DISTINCT "tblFig->tblFpo"."id") FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."StateName" = "tblFarmer"."StateName" GROUP BY sub."StateName")'),
+    //             'fpoCount'
+    //         ],
+    //     ],
+    //     include: [{
+    //         model: tblFig,
+    //         attributes: [],
+    //         required: false,
+    //         include: [{
+    //             model: tblFpo,
+    //             attributes: [],
+    //             required: false,
+    //         }]
+    //     }],
+    //     // where:whereClause,
+    //     group: ['tblFarmer.StateName'],
+    //     raw: true
+    // });
+
+    // // const farmersWithFPO = await tblFarmer.findAll({
+    // //     attributes: [
+    // //         'StateName',
+    // //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('DistrictName'))), 'districtCount'],
+    // //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('figId'))), 'figCount'],
+    // //         [
+    // //             sequelize.literal('(SELECT "tblFpo"."name" FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."StateName" = "tblFarmer"."StateName" LIMIT 1)'),
+    // //             'fpoName'
+    // //         ],
+    // //         [
+    // //             sequelize.literal('(SELECT "tblFig"."name" FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" WHERE sub."StateName" = "tblFarmer"."StateName" LIMIT 1)'),
+    // //             'figName'
+    // //         ]
+    // //     ],
+    // //     include: [{
+    // //         model: tblFig,
+    // //         attributes: [], // No need to retrieve attributes from tblFig
+    // //         required: false
+    // //     }],
+    // //     group: ['tblFarmer.StateName'],
+    // //     raw: true
+    // // });
+
+    // // console.log(farmersWithFPO);
+
+    // let totalFarmer=0
+
+    // for(let i=0;i<farmersWithFPO.length;i++){
+    //     let current = farmersWithFPO[i];
+    //     totalFarmer += parseInt(current.farmerCount)
+    // }
+
+    // let totalFpos = await tblFpo.count();
+    // // let totalFigs = await tblFig.count();
+
+    // let data = {}
+
+    // data.totalFarmer = totalFarmer
+    // data.totalFpos = totalFpos
+    // // data.totalFigs = totalFigs
+    // data.CollectiveData = farmersWithFPO
+    // console.log(" i m hitted")
+
     let result = await groupDetails();
 
     return res
@@ -19,7 +99,8 @@ const collectiveData = async (req, res) => {
       .send({ status: true, message: "Sucess", data: result });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({status:false, message:"Server Error"})
+    // return res.status(500).send({status:false, message:"Server Error"})
+    return res.status(500).send({ status: false, message: error.message });
   }
 };
 
@@ -98,6 +179,31 @@ const groupDetails = async (phaseWise) => {
     raw: true,
   });
 
+  // const farmersWithFPO = await tblFarmer.findAll({
+  //     attributes: [
+  //         'StateName',
+  //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('DistrictName'))), 'districtCount'],
+  //         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('figId'))), 'figCount'],
+  //         [
+  //             sequelize.literal('(SELECT "tblFpo"."name" FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."StateName" = "tblFarmer"."StateName" LIMIT 1)'),
+  //             'fpoName'
+  //         ],
+  //         [
+  //             sequelize.literal('(SELECT "tblFig"."name" FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" WHERE sub."StateName" = "tblFarmer"."StateName" LIMIT 1)'),
+  //             'figName'
+  //         ]
+  //     ],
+  //     include: [{
+  //         model: tblFig,
+  //         attributes: [], // No need to retrieve attributes from tblFig
+  //         required: false
+  //     }],
+  //     group: ['tblFarmer.StateName'],
+  //     raw: true
+  // });
+
+  // console.log(farmersWithFPO);
+
   let totalFarmer = 0,
     totalDistrict = 0,
     landArea = 0,
@@ -119,6 +225,12 @@ const groupDetails = async (phaseWise) => {
     raw: true,
   });
 
+  // farmersWithFPO = farmersWithFPO.forEach(async (item)=>{
+  //     console.log(item,"__item")
+  //     item.landArea = await formatNumber(item.landArea);
+  //     return item;
+  // })
+
   for (let i = 0; i < farmersWithFPO.length; i++) {
     let current = farmersWithFPO[i];
     current.landArea = await formatNumber(current.landArea);
@@ -138,6 +250,92 @@ const groupDetails = async (phaseWise) => {
   data.CollectiveData = farmersWithFPO;
   return data;
 };
+
+// const groupDetails = async(phaseWise)=>{
+//     let whereClause = {}
+//     const phaseWiseData = {};
+
+// if (phaseWise && phaseWise.length > 0) {
+//     whereClause.Phase = {
+//         [Op.in]: phaseWise
+//     }
+// }
+
+// const farmersWithFPO = await tblFarmer.findAll({
+//     attributes: [
+//         'StateName',
+//         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('DistrictName'))), 'districtCount'],
+//         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FarmerCode'))), 'farmerCount'],
+//         [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('figId'))), 'figCount'],
+//         [
+//             sequelize.literal('(SELECT COUNT(DISTINCT "tblFig->tblFpo"."id") FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."StateName" = "tblFarmer"."StateName" GROUP BY sub."StateName")'),
+//             'fpoCount'
+//         ],
+//     ],
+//     where: whereClause,
+//     include: [{
+//         model: tblFig,
+//         attributes: [],
+//         required: false,
+//         include: [{
+//             model: tblFpo,
+//             attributes: [],
+//             required: false,
+//         }]
+//     }],
+//     group: ['tblFarmer.StateName'],
+//     raw: true
+// });
+
+// let totalFarmer = 0, totalDistrict = 0, totalArea = 0, totalFigs = 0;
+
+// for (let i = 0; i < farmersWithFPO.length; i++) {
+//     let current = farmersWithFPO[i];
+//     totalFarmer += parseInt(current.farmerCount);
+//     totalDistrict += parseInt(current.districtCount);
+//     totalArea += parseInt(current.areaCount);
+//     totalFigs += parseInt(current.figCount);
+
+//     // Add phase-specific data
+//     const phase = current.Phase;
+//     if (!phaseWiseData[phase]) {
+//         phaseWiseData[phase] = {
+//             totalFarmer: 0,
+//             totalDistrict: 0,
+//             totalArea: 0,
+//             totalFigs: 0,
+//             CollectiveData: []
+//         };
+//     }
+//     phaseWiseData[phase].totalFarmer += parseInt(current.farmerCount);
+//     phaseWiseData[phase].totalDistrict += parseInt(current.districtCount);
+//     phaseWiseData[phase].totalArea += parseInt(current.areaCount);
+//     phaseWiseData[phase].totalFigs += parseInt(current.figCount);
+//     phaseWiseData[phase].CollectiveData.push(current);
+// }
+
+// const totalFpos = await tblFpo.count();
+// const totalSp = await tblUser.count({
+//     where: {
+//         user_type: 'SP'
+//     },
+//     raw: true
+// });
+
+// const data = {
+//     totalDistrict: totalDistrict,
+//     totalFpos: totalFpos,
+//     totalFigs: totalFigs,
+//     totalArea: totalArea,
+//     totalFarmer: totalFarmer,
+//     totalSp: totalSp,
+//     phases: phaseWiseData
+// };
+// console.log(data)
+
+// return data;
+
+// }
 
 const getDrillDetails = async (req, res) => {
   try {
@@ -160,6 +358,106 @@ const getDrillDetails = async (req, res) => {
       return res.status(200).send({ status: true, data: result });
     }
 
+    // [
+    //     "DistrictName",
+    //     // [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FarmerCode'))), 'farmerCount'],
+    //     [
+    //         sequelize.literal(`(
+    //             SELECT COUNT(DISTINCT sub."FarmerCode")
+    //             FROM "tblFarmer" AS sub
+    //             LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //             LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //             WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //             AND "tblFpo"."id" IS NOT NULL
+    //         )`),
+    //         'farmerCount'
+    //     ],
+    //     [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('figId'))), 'figCount'],
+    //     [
+    //         sequelize.literal('(SELECT COUNT(DISTINCT "tblFig->tblFpo"."id") FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."DistrictName" = "tblFarmer"."DistrictName" GROUP BY sub."DistrictName")'),
+    //         'fpoCount'
+    //     ],
+
+    //     // ------ working donwards
+    //     [
+    //     sequelize.literal('(SELECT "tblFpo"."Name" FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."DistrictName" = "tblFarmer"."DistrictName" LIMIT 1)'),
+    //     'fpoName'
+    //     ],
+    //     [
+    //     sequelize.literal('(SELECT "tblFpo"."id" FROM "tblFarmer" AS sub LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id" LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id" WHERE sub."DistrictName" = "tblFarmer"."DistrictName" LIMIT 1)'),
+    //     'fpoId'
+    //     ]
+    // ]
+    //         // // -------- working upwards
+
+    //         [
+    //             sequelize.literal(`(
+    //               SELECT "tblFpo"."Name"
+    //               FROM "tblFarmer" AS sub
+    //               LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //               LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //               WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //               AND "tblFpo"."id" IS NOT NULL
+    //               LIMIT 1
+    //             )`),
+    //             'fpoName'
+    //           ],
+    //           [
+    //             sequelize.literal(`(
+    //               SELECT "tblFpo"."id"
+    //               FROM "tblFarmer" AS sub
+    //               LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //               LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //               WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //               AND "tblFpo"."id" IS NOT NULL
+    //               LIMIT 1
+    //             )`),
+    //             'fpoId'
+    //           ]
+    // ]
+
+    // [
+    //     [
+    //       sequelize.literal(`(
+    //         SELECT "tblFpo"."Name"
+    //         FROM "tblFarmer" AS sub
+    //         LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //         LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //         WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //       )`),
+    //       'fpoName'
+    //     ],
+    //     [
+    //       sequelize.literal(`(
+    //         SELECT "tblFpo"."id"
+    //         FROM "tblFarmer" AS sub
+    //         LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //         LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //         WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //       )`),
+    //       'fpoId'
+    //     ],
+    //     [
+    //       sequelize.literal(`(
+    //         SELECT COUNT(DISTINCT sub."FarmerCode")
+    //         FROM "tblFarmer" AS sub
+    //         LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //         LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //         WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //       )`),
+    //       'farmerCount'
+    //     ],
+    //     [
+    //       sequelize.literal(`(
+    //         SELECT COUNT(DISTINCT "tblFig"."id")
+    //         FROM "tblFarmer" AS sub
+    //         LEFT JOIN "tblFig" ON sub."figId" = "tblFig"."id"
+    //         LEFT JOIN "tblFpo" ON "tblFig"."fpoId" = "tblFpo"."id"
+    //         WHERE sub."DistrictName" = "tblFarmer"."DistrictName"
+    //       )`),
+    //       'figCount'
+    //     ]
+    //   ]
     const whereClause = StateName
       ? { StateName: StateName }
       : { DistrictName: DistrictName, figId: { [Op.not]: null } };
@@ -425,6 +723,47 @@ const cardData = async (req, res) => {
 
 const fetchPhaseWiseState = async (req, res) => {
   try {
+    // let getDetailsOfPhaseWiseState =await tblFarmer.findAll({
+    //     attributes: [
+    //         'StateName',
+    //         'Phase'
+    //     ],
+    //     where: {
+    //         [Op.and]: [
+    //             {
+    //                 Phase: {
+    //                     [Op.not]: null
+    //                 }
+    //             },
+    //             {
+    //                 Phase: {
+    //                     [Op.ne]: ''
+    //                 }
+    //             }
+    //         ]
+    //     },
+    //     group: ['StateName', 'Phase']
+    // });
+
+    // let map = new Map();
+    // getDetailsOfPhaseWiseState.forEach(row => {
+    //     const { Phase, StateName } = row;
+    //     if (map.has(Phase)) {
+    //         map.get(Phase).push(StateName);
+    //     } else {
+    //         map.set(Phase, [StateName]);
+    //     }
+    // });
+
+    // let phaseStateObject = {};
+    // getDetailsOfPhaseWiseState.forEach(row => {
+    //     const { Phase, StateName } = row;
+    //     if (!phaseStateObject[Phase]) {
+    //         phaseStateObject[Phase] = [];
+    //     }
+    //     phaseStateObject[Phase].push(StateName);
+    // });
+
     let token =
       req.cookies.access_token || req.headers?.authorization?.split(" ")[1];
 
@@ -440,6 +779,16 @@ const fetchPhaseWiseState = async (req, res) => {
 
     }
     if (token && (req.decodedToken.data.user_type == "SP" || req.decodedToken.data.user_type == "DC") ) {
+      // await new Promise((resolve, reject) => {
+      //     authentication(req, res, (err) => {
+      //       if (err) {
+      //         return reject(err);
+      //       }
+      //       resolve();
+      //     });
+      //   });
+
+      //   const { user_id } = req.decodedToken.data;
 
       const user_details = await tblUser.findOne({
         where: { id: req.decodedToken.data.user_id },

@@ -43,6 +43,9 @@ let getFarmerDetails = async (req, res) => {
         "VillageName",
         "LandArea"
       ],
+      order:[
+        ["FarmerName", "ASC"]
+      ],
       raw: true,
     });
 
@@ -74,6 +77,99 @@ const figfpoFarmerDetails = async (req, res) => {
 
     } else {
       if (fpoId) {
+        // let figDetails = await tblFig.findAll({
+        //   where:{
+        //     fpoId:fpoId
+        //   },
+        //   attributes:["id"],
+        //   raw:true
+        // })
+        // let allFig = figDetails.map((fig)=>fig.id)
+        // farmerDetails = await tblFarmer.findAll({
+        //   where:{
+        //     DistrictName:DistrictName,
+        //     figId:allFig
+        //   }
+        // })
+
+        //   const farmerDetails = await tblFarmer.findAll({
+        //     [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FarmerCode'))), 'farmerCount'],
+        //     include: [{
+        //         model: tblFig,
+        //         where: {
+        //             fpoId: fpoId
+        //         },
+        //         attributes: ["id"],
+        //         required: true
+        //     }],
+        //     where: {
+        //         DistrictName: DistrictName
+        //     },
+        //     raw:true
+
+        // });
+        // let fpoDetails = await tblFig.findAll({
+        //   where:{
+        //     fpoId:fpoId
+        //   },
+        //   raw:true
+        // })
+
+        // working downwards //
+        // const figDetails = await tblFarmer.findAll({
+        //   include: [
+        //     {
+        //       model: tblFig,
+        //       where: {
+        //         fpoId: fpoId,
+        //       },
+        //       attributes: ["id", "Name"],
+        //       required: true,
+        //     },
+        //   ],
+        //   attributes: [
+        //     [
+        //       sequelize.fn(
+        //         "COUNT",
+        //         sequelize.fn("DISTINCT", sequelize.col("tblFarmer.FarmerCode"))
+        //       ),
+        //       "farmerCount",
+        //     ],
+        //     [sequelize.fn("SUM", sequelize.literal('CAST("LandArea" AS NUMERIC)')), "landArea"],
+        //   ],
+        //   where: {
+        //     DistrictName: DistrictName,
+        //   },
+        //   group: ["tblFig.id"],
+        //   raw: true,
+        // });
+        // working upwards
+        // const rawQuery = `
+        // SELECT 
+        //   COUNT(DISTINCT "tblFarmer"."FarmerCode") AS "farmerCount",
+        //   SUM(CAST("tblFarmer"."LandArea" AS NUMERIC)) AS "landArea",
+        //   SUM(COALESCE(CAST("tblCrop"."Yield" AS NUMERIC), "N/A")) AS "production",
+        //   "tblFig"."id" AS "tblFig.id",
+        //   "tblFig"."Name" AS "tblFig.Name"
+        // FROM 
+        //   "tblFarmer"
+        // INNER JOIN 
+        //   "tblFig" ON "tblFarmer"."figId" = "tblFig"."id"
+        // LEFT JOIN 
+        //   "tblCrop" ON "tblFarmer"."id" = "tblCrop"."farmerId"
+        // WHERE 
+        //   "tblFarmer"."DistrictName" = :DistrictName
+        //   AND "tblFig"."fpoId" = :fpoId
+        // GROUP BY 
+        //   "tblFig"."id", "tblFig"."Name"
+        // `;
+        
+        // const figDetails = await sequelize.query(rawQuery, {
+        //   replacements: { DistrictName: DistrictName, fpoId: fpoId },
+        //   type: sequelize.QueryTypes.SELECT,
+        //   raw: true
+        // });
+
 
       const figDetails = await tblFarmer.findAll({
         include: [
@@ -132,6 +228,14 @@ const figfpoFarmerDetails = async (req, res) => {
         group: ["figId"],
         raw: true
       });
+      // let lrpDetails = await tblLrp.findAll({
+      //   where:{
+      //     id:{
+      //       [Op.in]: figId
+      //     }
+      //   },
+      //   raw:true
+      // })
 
       const landAreaMap = landAreaResults.reduce((map, obj) => {
         map[obj.figId] = obj.landArea;
@@ -193,7 +297,7 @@ const insertDataInTable = async(req,res)=>{
           }
             const farmer = await tblFarmer.create({
               FarmerCode: farmerData.farmerCode,
-              FarmerName: farmerData.farmerName,
+              FarmerName: farmerData.farmerName.toUpperCase(),
               FatherName: farmerData.fatherName,
               AdharNo: farmerData.aadharNo,
               Gender: farmerData.gender,
@@ -206,21 +310,82 @@ const insertDataInTable = async(req,res)=>{
               // PolygonArea: farmerData.farmerCropSurveyPolygonList[0].polygonArea ? farmerData.farmerCropSurveyPolygonList[0].polygonArea : null,
               PolygonArea: farmerData.farmerCropSurveyPolygonList.length > 0 ? farmerData.farmerCropSurveyPolygonList[0]?.polygonArea : null,
               SchemeName: farmerData.schemeName,
-              DistrictName: farmerData.districtName,
-              SubDistrictName: farmerData.subDistrictName,
-              StateName: farmerData.stateName,
-              VillageName: farmerData.villageName,
+              DistrictName: farmerData.districtName.toUpperCase(),
+              SubDistrictName: farmerData.subDistrictName.toUpperCase(),
+              StateName: farmerData.stateName.toUpperCase(),
+              VillageName: farmerData.villageName.toUpperCase(),
               CasteCatName: farmerData.casteCatName,
               Phase: "Phase IV",
               SmartPhone: farmerData.SmartPhone,
               createdAt: farmerData.createdOn,
             }
           );
+          // for (const cropData of farmerData.farmerCropDetailsExtsList) {
+          //     cropData.farmerid = farmer.id;
+          //     if(farmerData.farmerCode == cropData.farmerCode ){
+          //       await KMtblCrop.create({
+          //         CropName : cropData.multiCropName,
+          //         farmerId: cropData.farmerid,
+          //         Phase: "Phase IV",
+          //         SeasonName: cropData.seasonName,
+          //         CropGroupName : cropData.multiCropGroupName,
+          //         FarmerCode  : cropData.farmerCode,
+          //         FinYear : cropData.finYear,
+          //         Yield :cropData.multiYieldName,
+          //         CreatedAt : cropData.createdOn
+          //       });
+          //     }
+
+
+          // }
+          // break;
+
+          
+      // if (farmerData.multiCropGroupName && farmerData.multiCropGroupName.includes('||')) {
+      //   const cropGroups = farmerData.multiCropGroupName.split('||');
+      //   const cropNames = farmerData.multiCropName.split('||');
+
+      //   for (let i = 0; i < cropGroups.length; i++) {
+      //     const cropGroupName = cropGroups[i];
+      //     const cropNameArray = cropNames[i].split(',');
+
+      //     for (const cropName of cropNameArray) {
+      //       await KMtblCrop.create({
+      //         CropName: cropName.trim(),
+      //         farmerId: farmer.id,
+      //         Phase: "Phase IV",
+      //         SeasonName: farmerData.seasonName,
+      //         CropGroupName: cropGroupName,
+      //         FarmerCode: farmerData.farmerCode,
+      //         FinYear: farmerData.finYear,
+      //         Yield: farmerData.multiYieldName,
+      //         CreatedAt: farmerData.createdOn
+      //       });
+      //     }
+      //   }
+      // } else {
+      //   const cropNameArray = farmerData.multiCropName.split(';');
+
+      //   for (const cropName of cropNameArray) {
+      //     await KMtblCrop.create({
+      //       CropName: cropName.trim(),
+      //       farmerId: farmer.id,
+      //       Phase: "Phase IV",
+      //       SeasonName: farmerData.seasonName,
+      //       CropGroupName: farmerData.multiCropGroupName,
+      //       FarmerCode: farmerData.farmerCode,
+      //       FinYear: farmerData.finYear,
+      //       Yield: farmerData.multiYieldName,
+      //       CreatedAt: farmerData.createdOn
+      //     });
+      //   }
+      // }
 
             for (const cropData of farmerData.farmerCropDetailsExtsList) {
               if (cropData.multiCropGroupName && cropData.multiCropGroupName.includes('||')) {
                 const cropGroups = cropData.multiCropGroupName.split('||');
                 const cropNames = cropData.multiCropName.split('||');
+                // const yieldName = cropData.multiYieldName ? cropData.multiYieldName.split('||') : []
                     const yieldName = cropData.multiYieldName 
                 ? cropData.multiYieldName.trim() !== '' 
                   ? cropData.multiYieldName.split('||').map(item => item.trim()) 
@@ -229,18 +394,21 @@ const insertDataInTable = async(req,res)=>{
                 for (let i = 0; i < cropGroups.length; i++) {
                   const cropGroupName = cropGroups[i];
                   const cropNameArray = cropNames[i].split(',');
+                  // const yieldArray = yieldName[i].split(',');
+                  // const yieldArray = yieldName[i] ? yieldName[i].split(',') : [];
                   let yieldArray =[]
                   if(yieldName.length>0){
                     yieldArray = yieldName[i].split(',');
                   }
+                  // for (const cropName of cropNameArray) {
               for (let j = 0; j < cropNameArray.length; j++) {
 
                     await tblCrop.create({
-                      CropName: cropNameArray[j].trim(),
+                      CropName: cropNameArray[j].trim().toUpperCase(),
                       farmerId: farmer.id,
                       Phase: "Phase IV",
-                      SeasonName: cropData.seasonName,
-                      CropGroupName: cropGroupName,
+                      SeasonName: cropData.seasonName.toUpperCase(),
+                      CropGroupName: cropGroupName.toUpperCase(),
                       FarmerCode: cropData.farmerCode,
                       FinYear: cropData.finYear,
                       Yield: yieldArray[j],
@@ -250,6 +418,8 @@ const insertDataInTable = async(req,res)=>{
                 }
               } else {
                 const cropNameArray = cropData.multiCropName.split(',');
+                // const yieldNameArray = cropData.multiYieldName.split(',');
+                // const yieldNameArray = cropData.multiYieldName ? cropData.multiYieldName.split(',') : [];
                 const yieldNameArray = cropData.multiYieldName 
             ? cropData.multiYieldName.trim() !== '' 
               ? cropData.multiYieldName.split(',').map(item => item.trim()) 
@@ -259,11 +429,11 @@ const insertDataInTable = async(req,res)=>{
                 let index = 0
                 for (const cropName of cropNameArray) {
                   await tblCrop.create({
-                    CropName: cropName.trim(),
+                    CropName: cropName.trim().toUpperCase(),
                     farmerId: farmer.id, 
                     Phase: "Phase IV",
-                    SeasonName: cropData.seasonName,
-                    CropGroupName: cropData.multiCropGroupName,
+                    SeasonName: cropData.seasonName.toUpperCase(),
+                    CropGroupName: cropData.multiCropGroupName.toUpperCase(),
                     FarmerCode: cropData.farmerCode,
                     FinYear: cropData.finYear,
                     Yield: yieldNameArray[index] || null, 
@@ -271,6 +441,20 @@ const insertDataInTable = async(req,res)=>{
                   });
                   index++
                 }
+
+          // for (let i = 0; i < cropNameArray.length; i++) {
+          //   await tblCrop.create({
+          //     CropName: cropNameArray[i].trim(),
+          //     farmerId: farmer.id,
+          //     Phase: "Phase IV",
+          //     SeasonName: cropData.seasonName,
+          //     CropGroupName: cropData.multiCropGroupName,
+          //     FarmerCode: cropData.farmerCode,
+          //     FinYear: cropData.finYear,
+          //     Yield: yieldNameArray[i] ? yieldNameArray[i].trim() : null,
+          //     CreatedAt: cropData.createdOn
+          //   });
+          // }
               }
             }
         }

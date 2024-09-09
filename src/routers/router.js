@@ -6,8 +6,9 @@ const { authentication,spCheck, jsOrSLACheck, dcCheck } = require("../middleware
 const { getNotification, createNotification, updateNotification, deleteNotification, getNotificationBySLA, downloadAttachments } = require("../controllers/notificationController");
 const { cropDetails, phaseWiseCropList, groupWiseCrop } = require("../controllers/cropController");
 const { figCreation ,getUnlistedFigs, allFigsList } = require("../controllers/figController");
-const { fpoCreation, fpoListDistrict, getAllSpList , getAllFpoStatusWise, updateStautusOfFpo} = require("../controllers/fpoController");
+const { fpoCreation, fpoListDistrict, getAllSpList , getAllFpoStatusWise, updateStautusOfFpo, rejectFpos} = require("../controllers/fpoController");
 const { LrpCreation, allLrpList } = require("../controllers/lrpController");
+const { fetchStateCoOrdi } = require("../controllers/coOrdiController");
 
 
 const router = express.Router()
@@ -28,7 +29,7 @@ router.post("/login",userLogin);
 router.post("/landingData",collectiveData);
 router.post("/fetchDetails",getDrillDetails);
 // router.post("/cardData",getDrillDetails);
-
+router.get("/fetchCoOrdinate",fetchStateCoOrdi);
 router.post("/refresh",refreshTokenGeneration);
 
 // *============ Sp related Apis ==================* //
@@ -57,11 +58,12 @@ router.delete("/deleteNotification",authentication,jsOrSLACheck, deleteNotificat
 router.post("/createUser",authentication, createUser);
 router.post("/farmerDetails",authentication, figfpoFarmerDetails);
 
-// *============ JS related Apis ==================* //
+// *============ SLA related Apis ==================* //
 
 router.get("/getNotificationBySLA", getNotificationBySLA);
 router.post("/downloadNotification/:notificationId", downloadAttachments);
 router.post("/approve", authentication, updateStautusOfFpo);
+router.post("/reject",authentication,rejectFpos);
 
 // const fetchGeocode = async (location) => {
 //     try {

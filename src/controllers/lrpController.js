@@ -42,6 +42,14 @@ const LrpCreation = async (req,res)=>{
       let createLrp = await tblLrp.create({
         Name, ContactNo, AllocatedDistrict, PinCode, Address ,Qualification
       })
+  
+    //   let figCheck = await tblFig.findAll({
+    //     where:{
+    //         id:{
+    //             [Op.in]:figId
+    //         }
+    //     }
+    //   })
       
         await tblFig.update(
           { lrpId: createLrp.id },
@@ -73,15 +81,12 @@ const allLrpList = async (req, res)=>{
     if(!District ){
       District = req.decodedToken.data.District
     }
-    if(user_type == "SLA"){
-      if(user_type == "SLA" ){
+    if(user_type == "SLA" && !District){
         let districtDetails = await fetchDistrictDetailsForSLA(State)
         District = districtDetails
-      }
     }
     
     const districtArray = `ARRAY[${District.map(d => `'${d}'`).join(',')}]`;
-
     const whereClause = sequelize.literal(`
       EXISTS (
         SELECT 1

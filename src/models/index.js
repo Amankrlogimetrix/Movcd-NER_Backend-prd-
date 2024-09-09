@@ -6,10 +6,12 @@ const tblFpo = require("./fpoModel");
 const tblFig = require("./figModel");
 const tblFarmer = require("./farmersModel");
 const tblCrop = require("./cropsModel");
+const tblRejection = require("./rejectionLogModel");
 const KMtblFarmer= require("./KmfarmerModel");
 const KMtblCrop= require("./KMtblCropModel");
 const tblNotification= require("./notificationModel");
 const tblLrp = require("./lrpModel");
+const tblStateCoOrdi = require('./tblStateCordinates')
 
 // Establishing relationships
 
@@ -28,6 +30,10 @@ tblFig.belongsTo(tblLrp, { foreignKey: 'lrpId' });
 tblFarmer.hasMany(tblCrop, { foreignKey: 'farmerId' });
 tblCrop.belongsTo(tblFarmer, { foreignKey: 'farmerId' });
 
+tblFpo.hasMany(tblRejection , {foreignKey : 'fpoId' });
+tblRejection.belongsTo(tblFpo, { foreignKey: 'fpoId' })
+
+
 
 KMtblFarmer.hasMany(KMtblCrop, { foreignKey: 'farmerId' });
 KMtblCrop.belongsTo(KMtblFarmer, { foreignKey: 'farmerId' });
@@ -43,6 +49,7 @@ module.exports = {
     KMtblFarmer,
     KMtblCrop,
     tblNotification,
+    tblStateCoOrdi,
     sequelize,
     Sequelize
 };

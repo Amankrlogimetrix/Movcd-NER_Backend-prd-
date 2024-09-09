@@ -5,8 +5,8 @@ const fetchKMData = async () => {
   const data = {
     // startDate: '2020-06-01',
     // endDate: '2024-07-05'
-      startDate: '2024-08-07',
-      endDate: '2024-08-08'
+      startDate: '2024-08-09',
+      endDate: '2024-09-01'
 
     //while scheduling cron we will use this for last 24 hrs,
 
