@@ -319,110 +319,65 @@ const getNotification = async (req, res) => {
 
 const updateNotification = async (req, res) => {
   try {
-    let { notificationId, notification } = req.body;
+    const { user_type, State } = req.decodedToken.data;
+    const { notificationId, notification, Category } = req.body;
+    const file = req.files;
+
     if (!notificationId) {
-      return res
-        .status(400)
-        .send({ status: false, message: "notificationId is required" });
-    }
-    if (!notification) {
-      return res
-        .status(400)
-        .send({ status: false, message: "notification is required" });
-    }
-    if (notification.trim() == "") {
-      return res
-        .status(400)
-        .send({ status: false, message: "notification can not be empty" });
+      return res.status(400).json({ message: "Notification ID is required." });
     }
 
-    let existingNotification = await tblNotification.findByPk(notificationId);
-
+    const existingNotification = await tblNotification.findOne({ where: { id: notificationId, isDeleted: false } });
     if (!existingNotification) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Notification not found" });
-    }
-    if (existingNotification.isDeleted == true) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Notification is deleted" });
+      return res.status(404).json({ message: "Notification not found." });
     }
 
-    await existingNotification.update({ Notification: notification });
+    if (notification && notification.trim() === "") {
+      return res.status(400).json({ message: "Notification cannot be empty." });
+    }
 
-    return res
-      .status(200)
-      .send({ status: true, message: "Notification updated successfully" });
+    if (Category && Category.trim() === "") {
+      return res.status(400).json({ message: "Category cannot be empty." });
+    }
+
+    let allowedCategories;
+    if (user_type === "JS") {
+      allowedCategories = ["Guidelines", "MOM", "Instructions", "Progress Reports", "Any Other"];
+    } else if (user_type === "SLA") {
+      allowedCategories = ["Any Other", "Physical", "Financial", "Market Activities", "Infrastructure"];
+    } else {
+      return res.status(400).json({ message: "Invalid user type." });
+    }
+
+    if (Category && !allowedCategories.includes(Category)) {
+      return res.status(400).json({ message: `Invalid Category. (${allowedCategories.join(' || ')})` });
+    }
+
+    if (file && file.length > 0 && !isValidImage(file[0].originalname)) {
+      return res.status(400).json({ message: "Invalid file type." });
+    }
+
+    const updatedData = {
+      ...(notification && { Notification: notification }),
+      ...(Category && { Category }),
+      ...(file && file.length > 0 && { Attachments: file[0].buffer }),
+      CreatedBy: user_type,
+      State: user_type === "SLA" ? State : null,
+    };
+
+    await tblNotification.update(updatedData, { where: { id: notificationId } });
+
+    return res.status(200).json({
+      status: true,
+      message: "Notification updated successfully.",
+    });
   } catch (error) {
-    return res
-      .status(500)
-      .send({ status: false, message: "Server Error", error: error.message });
+    return res.status(500).json({
+      status: false,
+      message: "Server Error"
+    });
   }
 };
-
-// const updateNotification = async (req, res) => {
-//   try {
-//     const { user_type, State } = req.decodedToken.data;
-//     const { notificationId, notification, Category } = req.body;
-//     const file = req.files;
-
-//     if (!notificationId) {
-//       return res.status(400).json({ message: "Notification ID is required." });
-//     }
-
-//     const existingNotification = await tblNotification.findOne({ where: { id: notificationId, isDeleted: false } });
-//     if (!existingNotification) {
-//       return res.status(404).json({ message: "Notification not found." });
-//     }
-
-//     if (notification && notification.trim() === "") {
-//       return res.status(400).json({ message: "Notification cannot be empty." });
-//     }
-
-//     if (Category && Category.trim() === "") {
-//       return res.status(400).json({ message: "Category cannot be empty." });
-//     }
-
-//     let allowedCategories;
-//     if (user_type === "JS") {
-//       allowedCategories = ["Guidelines", "MOM", "Instructions", "Progress Reports", "Any Other"];
-//     } else if (user_type === "SLA") {
-//       allowedCategories = ["Any Other", "Physical", "Financial", "Market Activities", "Infrastructure"];
-//     } else {
-//       return res.status(400).json({ message: "Invalid user type." });
-//     }
-
-//     if (Category && !allowedCategories.includes(Category)) {
-//       return res.status(400).json({ message: `Invalid Category. (${allowedCategories.join(' || ')})` });
-//     }
-
-//     if (file && file.length > 0 && !isValidImage(file[0].originalname)) {
-//       return res.status(400).json({ message: "Invalid file type." });
-//     }
-
-//     const updatedData = {
-//       ...(notification && { Notification: notification }),
-//       ...(Category && { Category }),
-//       ...(file && file.length > 0 && { Attachments: file[0].buffer }),
-//       CreatedBy: user_type,
-//       State: user_type === "SLA" ? State : null,
-//     };
-
-//     await tblNotification.update(updatedData, { where: { id: notificationId } });
-
-//     return res.status(200).json({
-//       status: true,
-//       message: "Notification updated successfully.",
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       status: false,
-//       message: "Server Error"
-//     });
-//   }
-// };
-
 
 const deleteNotification = async (req, res) => {
   try {

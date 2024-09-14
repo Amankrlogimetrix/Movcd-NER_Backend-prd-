@@ -11,7 +11,8 @@ const KMtblFarmer= require("./KmfarmerModel");
 const KMtblCrop= require("./KMtblCropModel");
 const tblNotification= require("./notificationModel");
 const tblLrp = require("./lrpModel");
-const tblStateCoOrdi = require('./tblStateCordinates')
+const tblStateCoOrdi = require('./tblStateCordinates');
+const tblDistrictCoOrdi = require('./tblDistrictCordinatesModel');
 
 // Establishing relationships
 
@@ -50,6 +51,7 @@ module.exports = {
     KMtblCrop,
     tblNotification,
     tblStateCoOrdi,
+    tblDistrictCoOrdi,
     sequelize,
     Sequelize
 };

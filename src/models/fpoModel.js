@@ -72,6 +72,10 @@ const tblFpo = sequelize.define('tblFpo', {
         type: Sequelize.STRING(100),
         allowNull:true
     },
+    ChairManContactNo:{
+        type:Sequelize.STRING(100),
+        allowNull:true
+    },
     OfficeAddress:{
         type: Sequelize.STRING(255),
         allowNull:true

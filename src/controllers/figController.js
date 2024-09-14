@@ -142,12 +142,12 @@ const getUnlistedFigs = async (req, res) => {
       return res.status(400).send({status:false, message:"Please provide either lrp or fpo"})
     }
     
-    District = District.split(",");
     if (!District) {
       return res
         .status(400)
         .send({ status: false, message: "Please provide me District" });
     }
+    District = District.split(",");
 
     let whereClause = {
       District: {

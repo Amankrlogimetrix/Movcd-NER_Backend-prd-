@@ -21,7 +21,7 @@ const fpoCreation = async (req, res) => {
       Name,
       Phase,
       RegistrationNo,
-      State,
+      // State,
       District,
       Block,
       Pincode,
@@ -32,11 +32,11 @@ const fpoCreation = async (req, res) => {
       AccountName,
       BoardOfDirector,
       ChairManName,
+      chairman_contact_number,
       OfficeAddress,
       Status,
     } = req.body;
-    let { user_id } = req.decodedToken.data;
-
+    let { user_id , State } = req.decodedToken.data;
     if (fpoId) {
       let fpoDetails = await tblFpo.findOne({
         where: { id: fpoId },
@@ -80,12 +80,11 @@ const fpoCreation = async (req, res) => {
           });
         }
       }
-      if (fpoDetails.Status === "Save") {
+      if (fpoDetails.Status === "Save" || Status == "Submit") {
         let updateFields = {
           Name,
           Phase,
           RegistrationNo,
-          State,
           District,
           Block,
           Pincode,
@@ -96,6 +95,7 @@ const fpoCreation = async (req, res) => {
           AccountName,
           BoardOfDirector,
           ChairManName,
+          ChairManContactNo:chairman_contact_number,
           OfficeAddress,
           Status,
         };
@@ -156,7 +156,6 @@ const fpoCreation = async (req, res) => {
         "Name",
         "Phase",
         "RegistrationNo",
-        "State",
         "District",
         "Block",
         "Pincode",
@@ -167,6 +166,7 @@ const fpoCreation = async (req, res) => {
         "AccountName",
         "BoardOfDirector",
         "ChairManName",
+        "chairman_contact_number",
         "OfficeAddress",
         "Status",
         "figId",
@@ -221,6 +221,7 @@ const fpoCreation = async (req, res) => {
         AccountName,
         BoardOfDirector,
         ChairManName,
+        ChairManContactNo:chairman_contact_number,
         OfficeAddress,
         Status,
         spId: user_id,
@@ -262,12 +263,11 @@ const fpoCreation = async (req, res) => {
 const fpoListDistrict = async (req, res) => {
   try {
     let { District, State, user_type, user_id } = req.decodedToken.data;
-
     let { DistrictName, spId, status, startDate, endDate } = req.query;
-
+    
     let whereClause = {};
 
-    if (DistrictName || District) {
+    if (DistrictName || District !=null) {
       whereClause.District = DistrictName || District;
       whereClause.State = State;
     }
@@ -279,11 +279,16 @@ const fpoListDistrict = async (req, res) => {
       whereClause.spId = user_id;
     }
 
-    if (user_type == "SLA" && !status) {
+    if (user_type == "SLA" && (!status || status =="All")) {
       (whereClause.State = State),
         (whereClause.Status = {
           [Op.or]: ["Submit", "Reject"],
         });
+    }
+    if(user_type== "DC" && (!status || status == "All")){
+      whereClause.Status = {
+        [Op.or] : ["Submit","Reject"]
+      }
     }
     if (status && startDate && endDate) {
       const start = new Date(startDate);
@@ -311,6 +316,7 @@ const fpoListDistrict = async (req, res) => {
         whereClause.Status = "Reject";
         whereClause.SlaApprove = "false";
       } else if (status === "All") {
+
       } else {
         return res
           .status(400)
@@ -335,6 +341,7 @@ const fpoListDistrict = async (req, res) => {
         "CeoContactNo",
         "AccountName",
         "ChairManName",
+        "ChairManContactNo",
         "OfficeAddress",
         "State",
         "BoardOfDirector",
@@ -510,6 +517,9 @@ const getAllSpList = async (req, res) => {
       let districtDetails = await fetchDistrictDetailsForSLA(State);
       whereClause.District = districtDetails;
     }
+    (whereClause.Status = {
+      [Op.or]: ["Submit", "Reject"],
+    });
     const spWiseDetails = await tblFpo.findAll({
       attributes: [
         "spId",
