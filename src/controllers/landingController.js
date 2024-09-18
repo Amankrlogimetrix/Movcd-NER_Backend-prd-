@@ -812,35 +812,71 @@ const fetchPhaseWiseState = async (req, res) => {
       return res.status(200).send({status:true, data})
     }
     else{
-      const getDetailsOfPhaseWiseState = await tblFarmer.findAll({
-        attributes: [
-          "Phase",
-          [
-            sequelize.fn(
-              "ARRAY_AGG",
-              sequelize.literal('DISTINCT "StateName"')
-            ),
-            "StateName",
-          ],
-        ],
-        where: {
-          [Op.and]: [
-            {
-              Phase: {
-                [Op.not]: null,
-              },
-            },
-            {
-              Phase: {
-                [Op.ne]: "",
-              },
-            },
-          ],
-        },
-        group: ["Phase"],
-        raw: true,
-      });
+      // const getDetailsOfPhaseWiseState = await tblFarmer.findAll({
+      //   attributes: [
+      //     "Phase",
+      
+      //     [
+      //       sequelize.fn(
+      //         "ARRAY_AGG",
+      //         sequelize.literal('DISTINCT "StateName"')
+      //       ),
+      //       "StateName",
+      //     ],
+      //     // [
+      //     //   sequelize.fn(
+      //     //     "jsonb_agg",
+      //     //     sequelize.literal(`jsonb_build_object(
+      //     //       'stateName', "StateName",
+      //     //       'districts', ARRAY_AGG(DISTINCT "DistrictName")
+      //     //     )`)
+      //     //   ),
+      //     //   "StateWiseDistrict"
+      //     // ]
+      //   ],
+      //   where: {
+      //     [Op.and]: [
+      //       {
+      //         Phase: {
+      //           [Op.not]: null,
+      //         },
+      //       },
+      //       {
+      //         Phase: {
+      //           [Op.ne]: "",
+      //         },
+      //       },
+      //     ],
+      //   },
+      //   group: ["Phase"],
+      //   raw: true,
+      // });
 
+      const getDetailsOfPhaseWiseState = await sequelize.query(`
+        WITH StateDistricts AS (
+          SELECT
+            "Phase",
+            "StateName",
+            ARRAY_AGG(DISTINCT "DistrictName") AS districts
+          FROM "tblFarmer"
+          WHERE "Phase" IS NOT NULL AND "Phase" <> ''
+          GROUP BY "Phase", "StateName"
+        )
+        SELECT
+          "Phase",
+          ARRAY_AGG(DISTINCT "StateName") AS "StateName",
+          JSONB_AGG(
+            JSONB_BUILD_OBJECT(
+              'Districts', districts,
+              'StateName', "StateName"
+            )
+          ) AS StateWiseDistrict
+        FROM StateDistricts
+        GROUP BY "Phase"
+      `, {
+        type: sequelize.QueryTypes.SELECT,
+        raw: true
+      });
       let phase3 = {
         Phase: "Phase III",
         StateName: ["Arunachal Pradesh", "Manipur"],

@@ -17,7 +17,7 @@ router.get("/test-me",async(req,res)=>{
     return res.status(200).send({status:true, message:"Api works fine"})
 })
 
-router.post("/insertKMdata",insertDataInTable);
+// router.post("/insertKMdata",insertDataInTable);
 router.post("/cropDetails",cropDetails);
 router.get("/phaseWiseCrop",phaseWiseCropList);
 router.get("/phaseWiseState",fetchPhaseWiseState);
@@ -64,6 +64,8 @@ router.get("/getNotificationBySLA", getNotificationBySLA);
 router.post("/downloadNotification/:notificationId", downloadAttachments);
 router.post("/approve", authentication, updateStautusOfFpo);
 router.post("/reject",authentication,rejectFpos);
+
+
 
 // const fetchGeocode = async (location) => {
 //     try {

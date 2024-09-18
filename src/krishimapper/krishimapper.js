@@ -1,12 +1,14 @@
 const axios = require('axios');
+const { tblFarmer } = require('../models');
+const { fn, col } = require('sequelize');
 
 const fetchKMData = async () => {
   const url = 'https://krishimapper.dac.gov.in/appdevapi/api/Nature/FarmerDetails/GetMovcdDataDateWise';
   const data = {
     // startDate: '2020-06-01',
     // endDate: '2024-07-05'
-      startDate: '2024-08-09',
-      endDate: '2024-09-01'
+      startDate: '',
+      endDate: ''
 
     //while scheduling cron we will use this for last 24 hrs,
 
@@ -14,6 +16,16 @@ const fetchKMData = async () => {
     // endDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   };
 
+  const latestDocument = await tblFarmer.findOne({
+    attributes: [
+      [fn('DATE', col('createdAt')), 'createdDate']  
+    ],
+    order: [['createdAt', 'DESC']], 
+    raw:true
+  });
+  data.startDate= latestDocument.createdDate
+  data.endDate= new Date().toISOString().split('T')[0];
+  
   try {
     const response = await axios.post(url, data, {
       headers: {

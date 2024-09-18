@@ -281,7 +281,7 @@ const figfpoFarmerDetails = async (req, res) => {
   }
 };
 
-const insertDataInTable = async(req,res)=>{
+const insertDataInTable = async()=>{
   try {
         
         const KMdata = await fetchKMData();
@@ -459,13 +459,11 @@ const insertDataInTable = async(req,res)=>{
             }
         }
 
-
-          return res.status(200).send({message:"Sucessfully inserted alldata"})
-
-
+        console.log("Sucessfully inserted Faremers and Crop data from KM")
+        // return res.status(200).send({message:"Sucessfully inserted alldata"})
   } catch (error) {
     console.log("error :",error)
-    return res.status(500).send({status:false, message:"Server Error",error:error.message})
+    // return res.status(500).send({status:false, message:"Server Error",error:error.message})
   }
 };
 
@@ -495,14 +493,14 @@ const getVillageByDistrict = async(req,res)=>{
   }
 };
 
-// cron.schedule('0 * * * *', async () => {
-//   console.log('Fetching KM data...');
-//   await insertDataInTable();
-//   console.log('Data fetched:');
-// }, {
-//   scheduled: true,
-//   timezone: "Asia/Kolkata"
-// });
+cron.schedule('0 23 * * *', async () => {
+  console.log('Fetching KM data...');
+  await insertDataInTable();
+  console.log('Data fetched:');
+}, {
+  scheduled: true,
+  timezone: "Asia/Kolkata"
+});
 
 const fetchDistrictDetailsForSLA = async(State)=>{
 try {
