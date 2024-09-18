@@ -6,15 +6,6 @@ const cron = require('node-cron');
 let getFarmerDetails = async (req, res) => {
   try {
     let { DistrictName , VillageName, SubDistrict} = req.query;
-
-    // let whereClause = DistrictName
-    //   ? {
-    //       [Op.or]: [{ Phase: null }, { figId: null }],
-    //       DistrictName: DistrictName,
-    //     }
-    //   : {
-    //       [Op.or]: [{ Phase: null }, { figId: null }],
-    //     };
     let whereClause = {
       [Op.or]: [{ Phase: null }, { figId: null }],
     };
@@ -77,99 +68,6 @@ const figfpoFarmerDetails = async (req, res) => {
 
     } else {
       if (fpoId) {
-        // let figDetails = await tblFig.findAll({
-        //   where:{
-        //     fpoId:fpoId
-        //   },
-        //   attributes:["id"],
-        //   raw:true
-        // })
-        // let allFig = figDetails.map((fig)=>fig.id)
-        // farmerDetails = await tblFarmer.findAll({
-        //   where:{
-        //     DistrictName:DistrictName,
-        //     figId:allFig
-        //   }
-        // })
-
-        //   const farmerDetails = await tblFarmer.findAll({
-        //     [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('FarmerCode'))), 'farmerCount'],
-        //     include: [{
-        //         model: tblFig,
-        //         where: {
-        //             fpoId: fpoId
-        //         },
-        //         attributes: ["id"],
-        //         required: true
-        //     }],
-        //     where: {
-        //         DistrictName: DistrictName
-        //     },
-        //     raw:true
-
-        // });
-        // let fpoDetails = await tblFig.findAll({
-        //   where:{
-        //     fpoId:fpoId
-        //   },
-        //   raw:true
-        // })
-
-        // working downwards //
-        // const figDetails = await tblFarmer.findAll({
-        //   include: [
-        //     {
-        //       model: tblFig,
-        //       where: {
-        //         fpoId: fpoId,
-        //       },
-        //       attributes: ["id", "Name"],
-        //       required: true,
-        //     },
-        //   ],
-        //   attributes: [
-        //     [
-        //       sequelize.fn(
-        //         "COUNT",
-        //         sequelize.fn("DISTINCT", sequelize.col("tblFarmer.FarmerCode"))
-        //       ),
-        //       "farmerCount",
-        //     ],
-        //     [sequelize.fn("SUM", sequelize.literal('CAST("LandArea" AS NUMERIC)')), "landArea"],
-        //   ],
-        //   where: {
-        //     DistrictName: DistrictName,
-        //   },
-        //   group: ["tblFig.id"],
-        //   raw: true,
-        // });
-        // working upwards
-        // const rawQuery = `
-        // SELECT 
-        //   COUNT(DISTINCT "tblFarmer"."FarmerCode") AS "farmerCount",
-        //   SUM(CAST("tblFarmer"."LandArea" AS NUMERIC)) AS "landArea",
-        //   SUM(COALESCE(CAST("tblCrop"."Yield" AS NUMERIC), "N/A")) AS "production",
-        //   "tblFig"."id" AS "tblFig.id",
-        //   "tblFig"."Name" AS "tblFig.Name"
-        // FROM 
-        //   "tblFarmer"
-        // INNER JOIN 
-        //   "tblFig" ON "tblFarmer"."figId" = "tblFig"."id"
-        // LEFT JOIN 
-        //   "tblCrop" ON "tblFarmer"."id" = "tblCrop"."farmerId"
-        // WHERE 
-        //   "tblFarmer"."DistrictName" = :DistrictName
-        //   AND "tblFig"."fpoId" = :fpoId
-        // GROUP BY 
-        //   "tblFig"."id", "tblFig"."Name"
-        // `;
-        
-        // const figDetails = await sequelize.query(rawQuery, {
-        //   replacements: { DistrictName: DistrictName, fpoId: fpoId },
-        //   type: sequelize.QueryTypes.SELECT,
-        //   raw: true
-        // });
-
 
       const figDetails = await tblFarmer.findAll({
         include: [
@@ -228,15 +126,6 @@ const figfpoFarmerDetails = async (req, res) => {
         group: ["figId"],
         raw: true
       });
-      // let lrpDetails = await tblLrp.findAll({
-      //   where:{
-      //     id:{
-      //       [Op.in]: figId
-      //     }
-      //   },
-      //   raw:true
-      // })
-
       const landAreaMap = landAreaResults.reduce((map, obj) => {
         map[obj.figId] = obj.landArea;
         return map;
@@ -304,9 +193,6 @@ const insertDataInTable = async()=>{
               LandArea: farmerData.landArea,
               TotalArea: farmerData.totalArea,
               PolygonShape: farmerData.farmerCropSurveyPolygonList.length > 0 ? JSON.parse(farmerData.farmerCropSurveyPolygonList[0].polygonShape) : [],
-              // SurveyorLat: farmerData.farmerCropSurveyPolygonList[0].surveyorLat,
-              // SurveyorLong: farmerData.farmerCropSurveyPolygonList[0].surveyorLong,
-              // PolygonArea: farmerData.farmerCropSurveyPolygonList[0].polygonArea ? farmerData.farmerCropSurveyPolygonList[0].polygonArea : null,
               PolygonArea: farmerData.farmerCropSurveyPolygonList.length > 0 ? farmerData.farmerCropSurveyPolygonList[0]?.polygonArea : null,
               SchemeName: farmerData.schemeName,
               DistrictName: farmerData.districtName.toUpperCase(),
@@ -408,7 +294,7 @@ const getVillageByDistrict = async(req,res)=>{
   }
 };
 
-cron.schedule('00 23 * * *', async () => {
+cron.schedule('0 23 * * *', async () => {
   console.log('Fetching KM data...');
   await insertDataInTable();
   console.log('Data fetched:');

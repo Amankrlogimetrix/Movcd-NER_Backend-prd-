@@ -380,23 +380,6 @@ const fpoListDistrict = async (req, res) => {
           ),
           "cropProduction",
         ],
-        // [
-        //   sequelize.literal(`
-        //     ARRAY_AGG(
-        //       DISTINCT jsonb_build_object(
-        //         'id', "tblFigs"."id",
-        //         'Name', "tblFigs"."Name",
-        //         'FigBlock', "tblFigs"."BlockName",
-        //         'FarmerCount', COALESCE((
-        //           SELECT COUNT(*)
-        //           FROM public."tblFarmer" AS f
-        //           WHERE f."figId" = "tblFigs"."id"
-        //         ), 0)
-        //       )
-        //     )
-        //   `),
-        //   'figDetails'
-        // ]
         [
           sequelize.literal(`
             COALESCE(
@@ -405,6 +388,7 @@ const fpoListDistrict = async (req, res) => {
                   'id', "tblFigs"."id",
                   'Name', "tblFigs"."Name",
                   'FigBlock', "tblFigs"."BlockName",
+                  'createdAt', "tblFigs"."createdAt",
                   'FarmerCount', COALESCE((
                     SELECT COUNT(*)
                     FROM public."tblFarmer" AS f
