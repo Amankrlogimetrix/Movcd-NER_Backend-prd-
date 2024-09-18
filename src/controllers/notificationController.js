@@ -25,24 +25,6 @@ const createNotification = async (req, res) => {
 
     notification = notification.trim()
 
-  //   if(user_type == "JS"){
-
- 
-  //   if (
-  //     Category !== "Guidelines" &&
-  //     Category !== "MOM" &&
-  //     Category !== "Instructions" &&
-  //     Category !== "Progress Reports" &&
-  //     Category !== "Any Other"
-  //   ) {
-  //     return res
-  //       .status(400)
-  //       .json({
-  //         message:
-  //           "Invalid Category. (Guidelines || MOM || Instructions || Progress Reports || Any Other)",
-  //       });
-  //   }
-  // }
   let allowedCategories;
 
   if (user_type === "JS") {

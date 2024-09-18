@@ -66,26 +66,6 @@ router.post("/approve", authentication, updateStautusOfFpo);
 router.post("/reject",authentication,rejectFpos);
 
 
-
-// const fetchGeocode = async (location) => {
-//     try {
-//       const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json',
-//         {
-//           params: {
-//             address: location,
-//             key: "AIzaSyB2CMFPvzwTCFaXDzjjMQ6cWOqF2ov8-5U",
-//           },
-//         }
-//       );
-//       console.log("Geocode response:", response.data); // Log the full response
-//       return response.data.results[0].geometry.location;
-//     } catch (error) {
-//       console.error("Error fetching geocode:", error);
-//       return null;
-//     }
-//   };
-
-
 router.all("/*",(req,res)=>{
     return res.status(404).send({status:false, message:"HTTP Request not found"})
 })

@@ -6,7 +6,6 @@ const { Op, json } = require("sequelize");
 const insertCoOrdinates = async () => {
   try {
     console.log("i m hited");
-    // const jsonFilePath = path.join("D:/AMAN_LOGIMETRIX/new_coOrdi/States.json");
     const jsonFilePath = path.join(
       "D:/AMAN_LOGIMETRIX/new_coOrdi/MeghalayaDistricts.json"
     );
@@ -104,19 +103,6 @@ const fetchStateCoOrdi = async (req, res) => {
             "Invalid districtName parameter. It should be an array of strings.",
         });
       }
-      // let token =
-      //   req.cookies.access_token || req.headers?.authorization?.split(" ")[1];
-
-      // if (token) {
-      //   await new Promise((resolve, reject) => {
-      //     authentication(req, res, (err) => {
-      //       if (err) {
-      //         return reject(err);
-      //       }
-      //       resolve();
-      //     });
-      //   });
-      // }
       let districtCoOrdi = await tblDistrictCoOrdi.findAll({
         where: {
           District: {

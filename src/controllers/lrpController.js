@@ -42,15 +42,6 @@ const LrpCreation = async (req,res)=>{
       let createLrp = await tblLrp.create({
         Name, ContactNo, AllocatedDistrict, PinCode, Address ,Qualification
       })
-  
-    //   let figCheck = await tblFig.findAll({
-    //     where:{
-    //         id:{
-    //             [Op.in]:figId
-    //         }
-    //     }
-    //   })
-      
         await tblFig.update(
           { lrpId: createLrp.id },
           {

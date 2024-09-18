@@ -1,4 +1,4 @@
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const { sequelize, tblFarmer, tblCrop, tblFig, KMtblFarmer,KMtblCrop, tblLrp } = require("../models");
 const {fetchKMData} = require("../krishimapper/krishimapper")
 const cron = require('node-cron');
@@ -288,7 +288,6 @@ const insertDataInTable = async()=>{
         if (!KMdata || !Array.isArray(KMdata) || KMdata.length === 0) {
           console.log("Unable to fetch Data");
           return;
-          
         }
         for (const farmerData of KMdata) {
 
@@ -320,72 +319,10 @@ const insertDataInTable = async()=>{
               createdAt: farmerData.createdOn,
             }
           );
-          // for (const cropData of farmerData.farmerCropDetailsExtsList) {
-          //     cropData.farmerid = farmer.id;
-          //     if(farmerData.farmerCode == cropData.farmerCode ){
-          //       await KMtblCrop.create({
-          //         CropName : cropData.multiCropName,
-          //         farmerId: cropData.farmerid,
-          //         Phase: "Phase IV",
-          //         SeasonName: cropData.seasonName,
-          //         CropGroupName : cropData.multiCropGroupName,
-          //         FarmerCode  : cropData.farmerCode,
-          //         FinYear : cropData.finYear,
-          //         Yield :cropData.multiYieldName,
-          //         CreatedAt : cropData.createdOn
-          //       });
-          //     }
-
-
-          // }
-          // break;
-
-          
-      // if (farmerData.multiCropGroupName && farmerData.multiCropGroupName.includes('||')) {
-      //   const cropGroups = farmerData.multiCropGroupName.split('||');
-      //   const cropNames = farmerData.multiCropName.split('||');
-
-      //   for (let i = 0; i < cropGroups.length; i++) {
-      //     const cropGroupName = cropGroups[i];
-      //     const cropNameArray = cropNames[i].split(',');
-
-      //     for (const cropName of cropNameArray) {
-      //       await KMtblCrop.create({
-      //         CropName: cropName.trim(),
-      //         farmerId: farmer.id,
-      //         Phase: "Phase IV",
-      //         SeasonName: farmerData.seasonName,
-      //         CropGroupName: cropGroupName,
-      //         FarmerCode: farmerData.farmerCode,
-      //         FinYear: farmerData.finYear,
-      //         Yield: farmerData.multiYieldName,
-      //         CreatedAt: farmerData.createdOn
-      //       });
-      //     }
-      //   }
-      // } else {
-      //   const cropNameArray = farmerData.multiCropName.split(';');
-
-      //   for (const cropName of cropNameArray) {
-      //     await KMtblCrop.create({
-      //       CropName: cropName.trim(),
-      //       farmerId: farmer.id,
-      //       Phase: "Phase IV",
-      //       SeasonName: farmerData.seasonName,
-      //       CropGroupName: farmerData.multiCropGroupName,
-      //       FarmerCode: farmerData.farmerCode,
-      //       FinYear: farmerData.finYear,
-      //       Yield: farmerData.multiYieldName,
-      //       CreatedAt: farmerData.createdOn
-      //     });
-      //   }
-      // }
-
             for (const cropData of farmerData.farmerCropDetailsExtsList) {
               if (cropData.multiCropGroupName && cropData.multiCropGroupName.includes('||')) {
                 const cropGroups = cropData.multiCropGroupName.split('||');
                 const cropNames = cropData.multiCropName.split('||');
-                // const yieldName = cropData.multiYieldName ? cropData.multiYieldName.split('||') : []
                     const yieldName = cropData.multiYieldName 
                 ? cropData.multiYieldName.trim() !== '' 
                   ? cropData.multiYieldName.split('||').map(item => item.trim()) 
@@ -394,13 +331,10 @@ const insertDataInTable = async()=>{
                 for (let i = 0; i < cropGroups.length; i++) {
                   const cropGroupName = cropGroups[i];
                   const cropNameArray = cropNames[i].split(',');
-                  // const yieldArray = yieldName[i].split(',');
-                  // const yieldArray = yieldName[i] ? yieldName[i].split(',') : [];
                   let yieldArray =[]
                   if(yieldName.length>0){
                     yieldArray = yieldName[i].split(',');
                   }
-                  // for (const cropName of cropNameArray) {
               for (let j = 0; j < cropNameArray.length; j++) {
 
                     await tblCrop.create({
@@ -418,8 +352,6 @@ const insertDataInTable = async()=>{
                 }
               } else {
                 const cropNameArray = cropData.multiCropName.split(',');
-                // const yieldNameArray = cropData.multiYieldName.split(',');
-                // const yieldNameArray = cropData.multiYieldName ? cropData.multiYieldName.split(',') : [];
                 const yieldNameArray = cropData.multiYieldName 
             ? cropData.multiYieldName.trim() !== '' 
               ? cropData.multiYieldName.split(',').map(item => item.trim()) 
@@ -441,29 +373,12 @@ const insertDataInTable = async()=>{
                   });
                   index++
                 }
-
-          // for (let i = 0; i < cropNameArray.length; i++) {
-          //   await tblCrop.create({
-          //     CropName: cropNameArray[i].trim(),
-          //     farmerId: farmer.id,
-          //     Phase: "Phase IV",
-          //     SeasonName: cropData.seasonName,
-          //     CropGroupName: cropData.multiCropGroupName,
-          //     FarmerCode: cropData.farmerCode,
-          //     FinYear: cropData.finYear,
-          //     Yield: yieldNameArray[i] ? yieldNameArray[i].trim() : null,
-          //     CreatedAt: cropData.createdOn
-          //   });
-          // }
               }
             }
         }
-
         console.log("Sucessfully inserted Faremers and Crop data from KM")
-        // return res.status(200).send({message:"Sucessfully inserted alldata"})
   } catch (error) {
     console.log("error :",error)
-    // return res.status(500).send({status:false, message:"Server Error",error:error.message})
   }
 };
 
@@ -493,7 +408,7 @@ const getVillageByDistrict = async(req,res)=>{
   }
 };
 
-cron.schedule('0 23 * * *', async () => {
+cron.schedule('00 23 * * *', async () => {
   console.log('Fetching KM data...');
   await insertDataInTable();
   console.log('Data fetched:');

@@ -35,13 +35,6 @@ const userLogin = async (req, res) => {
       }
       if(userCheck.user_type == "SLA"){
 
-        // let getDetailsOfPhaseWiseState = await tblFarmer.findOne({
-        //   where: { StateName: userCheck.State },
-        //   attributes:[
-        //     [sequelize.literal(`ARRAY_AGG(DISTINCT "DistrictName")`), 'District']
-        //   ],
-        // raw:true 
-        // })
         data.State = userCheck.State
         data.District =  null
       }
@@ -49,8 +42,6 @@ const userLogin = async (req, res) => {
       let token = Jwt.sign(
         {
           exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-          // exp: Math.floor(Date.now() / 1000) + 60 * 2,
-          // expiresIn: '2m',
           data
         },
         process.env.JWT_SECRET

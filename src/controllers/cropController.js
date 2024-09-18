@@ -25,19 +25,6 @@ const cropDetails = async (req, res) => {
     if (StateName || !DistrictName) {
       attributesSet = [
         "CropName",
-        // [
-        //   sequelize.fn("SUM", sequelize.literal('CAST("Yield" AS NUMERIC)')),
-        //   "TotalProduction",
-        // ],
-        // [
-        //   sequelize.fn(
-        //     "SUM",
-        //     sequelize.literal(
-        //       "COALESCE(NULLIF(\"tblFigs->tblFarmers->tblCrops\".\"Yield\", ''), '0')::NUMERIC"
-        //     )
-        //   ),
-        //   "cropProduction",
-        // ],
         [
           sequelize.fn(
             "SUM",
@@ -77,10 +64,6 @@ const cropDetails = async (req, res) => {
     if (DistrictName) {
       attributesSet = [
         "CropName",
-        // [
-        //   sequelize.fn("SUM", sequelize.literal('CAST("Yield" AS NUMERIC)')),
-        //   "TotalProduction",
-        // ],
         [
           sequelize.fn(
             "SUM",
@@ -109,21 +92,6 @@ const cropDetails = async (req, res) => {
         ],
       ];
     }
-
-    // let groupBy
-
-    //       if(StateName){
-    //         groupBy = ["CropName", `tblFarmer.${AttributesState}`]
-    //       }else if(!StateName && !DistrictName){
-    //         groupBy = ["CropName", `tblFarmer.${AttributesState}`]
-    //       }else if (DistrictName){
-    //         groupBy =  [
-    //           "CropName",
-    //           `tblFarmer.${AttributesState}`,
-    //           "tblFarmer.tblFig.tblFpo.id",
-    //           "tblFarmer.tblFig.tblFpo.Name",
-    //         ];
-    //       }
     let groupBy =
       StateName || (!StateName && !DistrictName)
         ? ["CropName", `tblFarmer.${AttributesState}`]
@@ -164,8 +132,6 @@ const cropDetails = async (req, res) => {
       raw: true,
     });
 
-    // console.log(allCropDetails,"_____allCropDetails")
-
     let whereClause2 = {};
     if (StateName) {
       whereClause2["$tblFarmer.StateName$"] = StateName;
@@ -193,12 +159,6 @@ const cropDetails = async (req, res) => {
       ],
       raw: true,
     });
-
- 
-
-    // totalCropProduction = await formatNumber(
-    //   totalCropProduction.AllCropProduction /1000
-    // );
     
     totalCropProduction = (totalCropProduction.AllCropProduction /1000).toFixed(2)
     let selectedCropProduction = allCropDetails.reduce(
@@ -213,7 +173,6 @@ const cropDetails = async (req, res) => {
       current.districtCount = await formatNumber(current.districtCount);
       current.landArea = await formatNumber(current.landArea);
     }
-    // selectedCropProduction = await formatNumber(selectedCropProduction);
     selectedCropProduction = selectedCropProduction.toFixed(2);
     let data = {
       totalCropProduction,

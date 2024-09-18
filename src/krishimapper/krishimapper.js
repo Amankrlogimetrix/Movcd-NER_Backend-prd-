@@ -5,15 +5,9 @@ const { fn, col } = require('sequelize');
 const fetchKMData = async () => {
   const url = 'https://krishimapper.dac.gov.in/appdevapi/api/Nature/FarmerDetails/GetMovcdDataDateWise';
   const data = {
-    // startDate: '2020-06-01',
-    // endDate: '2024-07-05'
       startDate: '',
       endDate: ''
 
-    //while scheduling cron we will use this for last 24 hrs,
-
-    // startDate: new Date().toISOString().split('T')[0],
-    // endDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   };
 
   const latestDocument = await tblFarmer.findOne({
@@ -23,8 +17,19 @@ const fetchKMData = async () => {
     order: [['createdAt', 'DESC']], 
     raw:true
   });
-  data.startDate= latestDocument.createdDate
-  data.endDate= new Date().toISOString().split('T')[0];
+  if (latestDocument && latestDocument.createdDate) {
+    let createdDate = new Date(latestDocument.createdDate); 
+    createdDate.setDate(createdDate.getDate() + 1); 
+    data.startDate = createdDate.toISOString().split('T')[0]; 
+    let dateToFetch = new Date()
+    dateToFetch.setDate(dateToFetch.getDate() + 1)
+    //i have added + 1 day to fecth the current date data because from KM we are getting farmer data for previous day.
+    data.endDate = dateToFetch.toISOString().split('T')[0]
+  }
+  if (!data.startDate || !data.endDate) {
+    console.log("Start date or end date is missing. Cannot fetch data.");
+    return;
+  }
   
   try {
     const response = await axios.post(url, data, {
@@ -32,15 +37,7 @@ const fetchKMData = async () => {
         'Content-Type': 'application/json'
       }
     });
-    
-    // console.log(response.data);
-    // console.log((response.data.dataContent[0]),"Farmer count");
 
-    // for(let i=0 ;i<a ;i++){
-    //   console.log("farmer crop")
-    //   console.log(response.data.dataContent[i].farmerCropDetailsExtsList)
-    // }
-    // return res.status(200).send({status:true, data:response.data.dataContent[0]})
     return  response.data.dataContent 
   } catch (error) {
     console.error('Error fetching data:', error);
