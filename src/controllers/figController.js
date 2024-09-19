@@ -66,6 +66,35 @@ const figCreation = async (req, res) => {
             message: `${fpoDetails["tblFpo.Name"]} FPO is already submitted`,
           });
       }
+      let updateFields={
+        Name,
+        Phase,
+        BlockName,
+        District,
+        VillageName,
+        PinCode,
+        FigLeader,
+        FigLeaderContact,
+      }
+      for (let key in updateFields) {
+        if (updateFields[key] === undefined || updateFields[key] == "") {
+          delete updateFields[key];
+        }
+      }
+      
+      let changesToUpdate = {};
+      
+      for (let key in updateFields) {
+        if (updateFields[key] !== fpoDetails[key]) {
+          changesToUpdate[key] = updateFields[key];
+        }
+      }
+      
+      if (Object.keys(changesToUpdate).length > 0) {
+        await tblFig.update(changesToUpdate, {
+          where: { id: figId },
+        });
+      }
     }
 
     if (!Array.isArray(FarmersId) || FarmersId.length === 0) {
@@ -110,6 +139,21 @@ const figCreation = async (req, res) => {
       });
     }
 
+    let farmerMappedDetails  = await tblFarmer.findAll({
+      where:{
+        figId:figId
+      },
+      raw:true
+    })
+    let currentMappedFarmerId = farmerMappedDetails.map((a)=> a.id) 
+    const farmersToUnmap = currentMappedFarmerId.filter(id => !FarmersId.includes(id.toString()));
+    
+    if (farmersToUnmap.length > 0) {
+      await tblFarmer.update(
+        { figId: null }, 
+        { where: { id: { [Op.in]: farmersToUnmap } } }
+      );
+    }
     await tblFarmer.update(
       {
         figId: createFig ? createFig.id : figId,
@@ -125,10 +169,9 @@ const figCreation = async (req, res) => {
       .status(figId ? 200 : 201)
       .send({ status: true, message: responseMessage });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
-      .send({ status: false, message: "Server Error.", error: error.message });
+      .send({ status: false, message: "Server Error."});
   }
 };
 
@@ -250,12 +293,6 @@ const allFigsList = async (req,res)=>{
         [sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("tblFarmers.id"))), "farmerCount"],
         [sequelize.fn("MAX", sequelize.col("tblFpo.Status")),"FpoStatus"],
         [sequelize.fn("MAX", sequelize.col("tblFpo.SlaApprove")),"FpoSLaApprove"],
-        // [
-        //   sequelize.literal(
-        //     `ARRAY_AGG(DISTINCT jsonb_build_object('id', "tblFarmers".id, 'FarmerName', "tblFarmers"."FarmerName", 'FarmerCode', "tblFarmers"."FarmerCode", 'LandArea', "tblFarmers"."LandArea" ))`
-        //   ),
-        //   "farmerDetails",
-        // ],
         [
           sequelize.literal(
             `COALESCE(
@@ -277,7 +314,7 @@ const allFigsList = async (req,res)=>{
         "createdAt",
       ],
       group: ["tblFig.id"], 
-      order: [['createdAt', 'DESC']],
+      order: [['updatedAt', 'DESC']],
       raw: true
     });
     

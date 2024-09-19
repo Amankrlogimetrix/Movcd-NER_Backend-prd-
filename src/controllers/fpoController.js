@@ -80,7 +80,7 @@ const fpoCreation = async (req, res) => {
           });
         }
       }
-      if (fpoDetails.Status === "Save" || Status == "Submit") {
+      if (fpoDetails.Status === "Save" || Status == "Submit" ||Status == "Save" ) {
         let updateFields = {
           Name,
           Phase,
@@ -347,6 +347,18 @@ const fpoListDistrict = async (req, res) => {
         "BoardOfDirector",
         "updatedAt",
         [
+          sequelize.literal(`
+            (
+              SELECT "RejectionReason"
+              FROM public."tblRejection" AS r
+              WHERE r."fpoId" = "tblFpo"."id" AND "tblFpo"."Status" = 'Reject'
+              ORDER BY r."createdAt" DESC
+              LIMIT 1
+            )
+          `),
+          "RejectReason",
+        ],
+        [
           sequelize.fn(
             "COUNT",
             sequelize.fn("DISTINCT", sequelize.col("tblFigs.id"))
@@ -401,6 +413,7 @@ const fpoListDistrict = async (req, res) => {
           `),
           "figDetails",
         ],
+       
       ],
       include: [
         {
@@ -425,11 +438,10 @@ const fpoListDistrict = async (req, res) => {
       ],
       where: whereClause,
       group: ["tblFpo.id"],
-      order: [["createdAt", "DESC"]],
+      order: [["updatedAt", "DESC"]],
 
       raw: true,
     });
-
     let fpoDetailAddedStatus = fpoDetails.map((item) => {
       if (item.Status == "Submit" && item.SlaApprove == "true") {
         item.Status = "Approved";
