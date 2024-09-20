@@ -205,7 +205,7 @@ const insertDataInTable = async()=>{
               VillageCode: farmerData.villageCode,
               CasteCatName: farmerData.casteCatName,
               Phase: "Phase IV",
-              SmartPhone: farmerData.SmartPhone,
+              SmartPhone: farmerData.smartPhone,
               createdAt: farmerData.createdOn,
             }
           );
