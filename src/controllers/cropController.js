@@ -181,10 +181,9 @@ const cropDetails = async (req, res) => {
     };
     return res.status(200).send({ status: true, message: "All Crops", data });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
-      .send({ status: false, message: "Server Error", Error: error.message });
+      .send({ status: false, message: "Server Error" });
   }
 };
 

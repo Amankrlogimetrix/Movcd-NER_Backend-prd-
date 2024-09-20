@@ -196,9 +196,13 @@ const insertDataInTable = async()=>{
               PolygonArea: farmerData.farmerCropSurveyPolygonList.length > 0 ? farmerData.farmerCropSurveyPolygonList[0]?.polygonArea : null,
               SchemeName: farmerData.schemeName,
               DistrictName: farmerData.districtName.toUpperCase(),
+              DistrictCode: farmerData.districtCode,
               SubDistrictName: farmerData.subDistrictName.toUpperCase(),
+              SubDistrictCode: farmerData.subDistrictCode,
               StateName: farmerData.stateName.toUpperCase(),
+              StateCode: farmerData.stateCode,
               VillageName: farmerData.villageName.toUpperCase(),
+              VillageCode: farmerData.villageCode,
               CasteCatName: farmerData.casteCatName,
               Phase: "Phase IV",
               SmartPhone: farmerData.SmartPhone,
@@ -214,6 +218,9 @@ const insertDataInTable = async()=>{
                   ? cropData.multiYieldName.split('||').map(item => item.trim()) 
                   : [] 
                 : [];
+                const multiCropGroupCode = cropData.multiCropGroupCode.split("||")
+                const cropCode = cropData.multiCropCode.split("||")
+
                 for (let i = 0; i < cropGroups.length; i++) {
                   const cropGroupName = cropGroups[i];
                   const cropNameArray = cropNames[i].split(',');
@@ -221,7 +228,10 @@ const insertDataInTable = async()=>{
                   if(yieldName.length>0){
                     yieldArray = yieldName[i].split(',');
                   }
-              for (let j = 0; j < cropNameArray.length; j++) {
+                  const cropGroupCode= multiCropGroupCode[i]
+                  const cropCodeArray = cropCode[i].split(',');
+
+                  for (let j = 0; j < cropNameArray.length; j++) {
 
                     await tblCrop.create({
                       CropName: cropNameArray[j].trim().toUpperCase(),
@@ -229,6 +239,8 @@ const insertDataInTable = async()=>{
                       Phase: "Phase IV",
                       SeasonName: cropData.seasonName.toUpperCase(),
                       CropGroupName: cropGroupName.toUpperCase(),
+                      CropGroupCode: cropGroupCode,
+                      CropCode: cropCodeArray[j],
                       FarmerCode: cropData.farmerCode,
                       FinYear: cropData.finYear,
                       Yield: yieldArray[j],
@@ -252,6 +264,8 @@ const insertDataInTable = async()=>{
                     Phase: "Phase IV",
                     SeasonName: cropData.seasonName.toUpperCase(),
                     CropGroupName: cropData.multiCropGroupName.toUpperCase(),
+                    CropGroupCode: cropData.multiCropGroupCode,
+                    CropCode: cropData.multiCropCode,
                     FarmerCode: cropData.farmerCode,
                     FinYear: cropData.finYear,
                     Yield: yieldNameArray[index] || null, 

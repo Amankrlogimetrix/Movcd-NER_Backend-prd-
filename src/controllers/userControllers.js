@@ -78,7 +78,6 @@ const userLogin = async (req, res) => {
         data: user_details,
       });
     } catch (error) {
-        console.log("Error : ",error)
       return res.status(500).send({ status: false, message: "Server Error." });
     }
 };
@@ -154,10 +153,7 @@ const refreshTokenGeneration = async (req,res)=>{
       return res.status(406).json({ message: 'Unauthorized' });
   }
 
-
-    
   } catch (error) {
-    console.log(error)
     return res.status(500).send({status:false, message:"Server Error"})
   }
 };

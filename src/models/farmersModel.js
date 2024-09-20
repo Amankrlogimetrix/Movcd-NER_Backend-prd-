@@ -35,31 +35,10 @@ const tblFarmer = sequelize.define('tblFarmer', {
         type: Sequelize.STRING(50),
         allowNull:false
     },
-    // CasteCatCode:{
-    //     type: Sequelize.BIGINT,
-    //     allowNull:false
-    // },
     MobileNo:{
         type: Sequelize.BIGINT,
         allowNull:false
     },
-    // SurveyUserCode:{
-    //     type: Sequelize.BIGINT,
-    //     allowNull:false
-    // },
-    // FarmerID:{
-    //     type: Sequelize.BIGINT,
-    //     allowNull:true
-    // },
-    // FarmID:{
-    //     type: Sequelize.BIGINT,
-    //     defaultValue:0,
-    //     allowNull:false
-    // },
-    // SurveyNo:{
-    //     type: Sequelize.STRING(255),
-    //     allowNull:false
-    // },
     LandArea:{
         type: Sequelize.FLOAT,
         allowNull:false
@@ -68,30 +47,10 @@ const tblFarmer = sequelize.define('tblFarmer', {
         type: Sequelize.FLOAT,
         allowNull:false
     },
-    // ActivityType:{
-    //     type: Sequelize.STRING(255),
-    //     allowNull:true
-    // },
-    // ActivitySubType:{
-    //     type: Sequelize.STRING(255),
-    //     allowNull:false
-    // },
-    // AdharSHA256:{
-    //     type: Sequelize.STRING(255),
-    //     allowNull:false
-    // },
     PolygonShape:{
         type:Sequelize.JSONB,
         allowNull:true
     },
-    // SurveyorLat:{
-    //     type: Sequelize.FLOAT,
-    //     allowNull:false
-    // },
-    // SurveyorLong:{
-    //     type: Sequelize.FLOAT,
-    //     allowNull:false
-    // },
     PolygonArea:{
         type: Sequelize.FLOAT,
         allowNull:true
@@ -101,19 +60,11 @@ const tblFarmer = sequelize.define('tblFarmer', {
         defaultValue:"MOVCD",
         allowNull:false
     },
-    // ShortName:{
-    //     type: Sequelize.STRING(50),
-    //     allowNull:false
-    // },
-    // Latitude:{
-    //     type: Sequelize.FLOAT,
-    //     allowNull:false
-    // },
-    // Longitude:{
-    //     type: Sequelize.FLOAT,
-    //     allowNull:false
-    // },
     DistrictName:{
+        type: Sequelize.STRING(50),
+        allowNull:false
+    },
+    DistrictCode:{
         type: Sequelize.STRING(50),
         allowNull:false
     },
@@ -121,12 +72,24 @@ const tblFarmer = sequelize.define('tblFarmer', {
         type: Sequelize.STRING(50),
         allowNull:false
     },
+    SubDistrictCode:{
+        type: Sequelize.STRING(50),
+        allowNull:false
+    },
     StateName:{
+        type: Sequelize.STRING(50),
+        allowNull:false
+    },
+    StateCode:{
         type: Sequelize.STRING(50),
         allowNull:false
     },
     VillageName:{
         type: Sequelize.STRING(500),
+        allowNull:false
+    },
+    VillageCode:{
+        type: Sequelize.STRING(50),
         allowNull:false
     },
     CasteCatName:{

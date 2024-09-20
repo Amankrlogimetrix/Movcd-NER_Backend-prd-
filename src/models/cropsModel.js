@@ -12,6 +12,10 @@ const tblCrop = sequelize.define('tblCrop', {
         type: Sequelize.STRING(255),
         allowNull: false
     },
+    CropCode:{
+      type: Sequelize.STRING(255),
+      allowNull: false
+    },
     farmerId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -30,6 +34,10 @@ const tblCrop = sequelize.define('tblCrop', {
     },
     CropGroupName: {
       type: Sequelize.STRING,
+      allowNull:true
+    },
+    CropGroupCode:{
+      type:Sequelize.STRING,
       allowNull:true
     },
     FarmerCode: {

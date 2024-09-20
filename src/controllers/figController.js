@@ -337,8 +337,7 @@ const allFigsList = async (req,res)=>{
     return res.status(200).send({status:true, data:allFigList})
 
   } catch (error) {
-    console.log(error)
-    return res.status(500).send({status:false, message:"Server Error.", error:error.message})
+    return res.status(500).send({status:false, message:"Server Error."})
   }
 };
 

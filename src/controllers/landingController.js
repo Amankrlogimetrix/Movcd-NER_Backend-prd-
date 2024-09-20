@@ -18,7 +18,6 @@ const collectiveData = async (req, res) => {
       .status(200)
       .send({ status: true, message: "Sucess", data: result });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({status:false, message:"Server Error"})
   }
 };
@@ -384,10 +383,9 @@ const getDrillDetails = async (req, res) => {
 
     return res.status(200).send({ status: true, data });
   } catch (error) {
-    console.log("error: ", error);
     return res
       .status(500)
-      .send({ status: false, message: "Server Error.", error: error.message });
+      .send({ status: false, message: "Server Error." });
   }
 };
 
@@ -493,10 +491,9 @@ const fetchPhaseWiseState = async (req, res) => {
         .json({ status: true, data: getDetailsOfPhaseWiseState });
     }
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
-      .send({ status: false, message: "Server Error.", error: error.message });
+      .send({ status: false, message: "Server Error." });
   }
 };
 

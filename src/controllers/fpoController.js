@@ -492,10 +492,9 @@ const fpoListDistrict = async (req, res) => {
     data.tableData = fpoDetailAddedStatus;
     return res.status(200).send({ status: true, data });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
-      .send({ status: false, message: "Server Error.", error: error.message });
+      .send({ status: false, message: "Server Error." });
   }
 };
 

@@ -7,7 +7,6 @@ const fetchKMData = async () => {
   const data = {
       startDate: '',
       endDate: ''
-
   };
 
   const latestDocument = await tblFarmer.findOne({
@@ -43,7 +42,6 @@ const fetchKMData = async () => {
     console.error('Error fetching data:', error);
   }
 };
-
 
 
 
