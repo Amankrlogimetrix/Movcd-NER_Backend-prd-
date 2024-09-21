@@ -102,9 +102,9 @@ const createUser = async (req, res)=>{
         user_name,
         password,
         user_type,
-        user_code,
+        user_code: user_code.toUpperCase(),
         District,
-        State
+        State: State.toUpperCase()
       })
 
     return res.status(201).send({status:true, message:`${user_type} created successfully`})

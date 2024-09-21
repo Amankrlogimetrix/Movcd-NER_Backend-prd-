@@ -39,6 +39,7 @@ const figCreation = async (req, res) => {
         }
       }
     }
+    let farmersToUnmap;
     if (figId) {
       let fpoDetails = await tblFig.findOne({
         where: { id: figId },
@@ -95,6 +96,15 @@ const figCreation = async (req, res) => {
           where: { id: figId },
         });
       }
+      
+    let farmerMappedDetails  = await tblFarmer.findAll({
+      where:{
+        figId:figId
+      },
+      raw:true
+    })
+    let currentMappedFarmerId = farmerMappedDetails.map((a)=> a.id) 
+    farmersToUnmap = currentMappedFarmerId.filter(id => !FarmersId.includes(id.toString()));
     }
 
     if (!Array.isArray(FarmersId) || FarmersId.length === 0) {
@@ -138,17 +148,7 @@ const figCreation = async (req, res) => {
         FigLeaderContact
       });
     }
-
-    let farmerMappedDetails  = await tblFarmer.findAll({
-      where:{
-        figId:figId
-      },
-      raw:true
-    })
-    let currentMappedFarmerId = farmerMappedDetails.map((a)=> a.id) 
-    const farmersToUnmap = currentMappedFarmerId.filter(id => !FarmersId.includes(id.toString()));
-    
-    if (farmersToUnmap.length > 0) {
+    if (farmersToUnmap && farmersToUnmap.length > 0 && figId) {
       await tblFarmer.update(
         { figId: null }, 
         { where: { id: { [Op.in]: farmersToUnmap } } }
@@ -171,7 +171,7 @@ const figCreation = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .send({ status: false, message: "Server Error."});
+      .send({ status: false, message: "Server Error.", error: error.message});
   }
 };
 

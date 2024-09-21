@@ -205,7 +205,21 @@ const fpoCreation = async (req, res) => {
           .status(400)
           .send({ status: false, message: "CeoContactNo is invalid" });
       }
-
+      let figCheckData = await tblFig.findAll({
+        where: {
+          id: { [Op.in]: figId },
+          fpoId: { [Op.not]: null },
+        },
+        attributes: ["id", "Name"],
+        raw: true,
+      });
+      if (figCheckData.length > 0) {
+        let figName = figCheckData.map((fig) => fig.Name);
+        return res.status(400).send({
+          status: false,
+          message: `Fig are already mapped: ${figName.join(", ")}`,
+        });
+      }
       let createFpo = await tblFpo.create({
         Name,
         Phase,
@@ -226,21 +240,6 @@ const fpoCreation = async (req, res) => {
         Status,
         spId: user_id,
       });
-      let figCheckData = await tblFig.findAll({
-        where: {
-          id: { [Op.in]: figId },
-          fpoId: { [Op.not]: null },
-        },
-        attributes: ["id", "Name"],
-        raw: true,
-      });
-      if (figCheckData.length > 0) {
-        let figName = figCheckData.map((fig) => fig.Name);
-        return res.status(400).send({
-          status: false,
-          message: `Fig are already mapped: ${figName.join(", ")}`,
-        });
-      }
 
       await tblFig.update(
         {
