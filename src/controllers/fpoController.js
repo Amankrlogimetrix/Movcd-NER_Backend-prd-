@@ -397,6 +397,7 @@ const fpoListDistrict = async (req, res) => {
               jsonb_agg(
                 DISTINCT jsonb_build_object(
                   'id', "tblFigs"."id",
+                  'FigLeader',"tblFigs"."FigLeader", 
                   'Name', "tblFigs"."Name",
                   'FigBlock', "tblFigs"."BlockName",
                   'createdAt', "tblFigs"."createdAt",
@@ -441,6 +442,7 @@ const fpoListDistrict = async (req, res) => {
 
       raw: true,
     });
+
     let fpoDetailAddedStatus = fpoDetails.map((item) => {
       if (item.Status == "Submit" && item.SlaApprove == "true") {
         item.Status = "Approved";

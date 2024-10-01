@@ -312,6 +312,7 @@ const allFigsList = async (req,res)=>{
         
         
         "createdAt",
+        "updatedAt"
       ],
       group: ["tblFig.id"], 
       order: [['updatedAt', 'DESC']],

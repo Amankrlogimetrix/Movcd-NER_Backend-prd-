@@ -20,6 +20,10 @@ const tblNotification = sequelize.define('tblNotification', {
     type:Sequelize.STRING(255),
     allowNull:false
   },
+  FileSize:{
+    type:Sequelize.STRING(255),
+    allowNull:true
+  },
   Attachments:{
     type: Sequelize.BLOB, 
     allowNull: true,

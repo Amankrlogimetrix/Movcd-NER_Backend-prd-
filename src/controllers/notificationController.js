@@ -38,15 +38,21 @@ const createNotification = async (req, res) => {
   if (!allowedCategories.includes(Category)) {
     return res.status(400).json({ message: `Invalid Category. (${allowedCategories.join(' || ')})` });
   }  
-
+    if(file.length == 0){
+      return res.status(400).send({status:false, message:"Please Select a file"})
+    }
     if (!isValidImage(file[0].originalname)) {
       return res.status(400).json({ message: "Invalid file type." });
+    }
+    if(file[0].size > (12 * 1024 * 1024)){
+      return res.status(400).send({status:false, message:"Please upload file upto 12 MB"})
     }
     await tblNotification.create({
       Notification: notification,
       Category,
       Attachments: file[0].buffer,
       FileName:file[0].originalname,
+      FileSize:file[0].size,
       CreatedBy: user_type,
       State: user_type == "SLA" ? State : null
     });
@@ -118,6 +124,7 @@ const getNotification = async (req, res) => {
                 'id', "id",
                 'Notification', "Notification",
                 'FileName', "FileName",
+                'FileSize', "FileSize",
                 'createdAt', "createdAt",
                 'updatedAt', "updatedAt"
               )
@@ -128,6 +135,7 @@ const getNotification = async (req, res) => {
               "id",
               "Notification",
               "FileName",
+              "FileSize",
               "createdAt",
               "updatedAt"
             FROM public."tblNotification"
@@ -339,10 +347,13 @@ const updateNotification = async (req, res) => {
       return res.status(400).json({ message: "Invalid file type." });
     }
 
+
     const updatedData = {
       ...(notification && { Notification: notification }),
       ...(Category && { Category }),
       ...(file && file.length > 0 && { Attachments: file[0].buffer }),
+      ...(file && file.length > 0 && { FileName: file[0].originalname }),
+      ...(file && file.length > 0 && { FileSize: file[0].size }),
       CreatedBy: user_type,
       State: user_type === "SLA" ? State : null,
     };
