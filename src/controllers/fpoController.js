@@ -163,7 +163,6 @@ const fpoCreation = async (req, res) => {
         "EmailId",
         "CeoName",
         "CeoContactNo",
-        "AccountName",
         "BoardOfDirector",
         "ChairManName",
         "chairman_contact_number",
@@ -398,6 +397,7 @@ const fpoListDistrict = async (req, res) => {
                 DISTINCT jsonb_build_object(
                   'id', "tblFigs"."id",
                   'FigLeader',"tblFigs"."FigLeader", 
+                  'FigLeaderContact',"tblFigs"."FigLeaderContact", 
                   'Name', "tblFigs"."Name",
                   'FigBlock', "tblFigs"."BlockName",
                   'createdAt', "tblFigs"."createdAt",

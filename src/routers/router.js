@@ -9,7 +9,9 @@ const { figCreation ,getUnlistedFigs, allFigsList } = require("../controllers/fi
 const { fpoCreation, fpoListDistrict, getAllSpList , getAllFpoStatusWise, updateStautusOfFpo, rejectFpos} = require("../controllers/fpoController");
 const { LrpCreation, allLrpList } = require("../controllers/lrpController");
 const { fetchStateCoOrdi } = require("../controllers/coOrdiController");
-
+const { viewQuarter } = require('../controllers/quarterController'); 
+const {getActivity}=require('../controllers/activityController')
+const {createAppraisal}=require('../controllers/appraisal')
 
 const router = express.Router()
 
@@ -34,6 +36,9 @@ router.post("/refresh",refreshTokenGeneration);
 
 // *============ Sp related Apis ==================* //
 
+router.post('/quarter/view', viewQuarter);
+router.post('/getactivity', getActivity);
+router.post('/create', createAppraisal)
 router.post("/createFig",authentication, spCheck, figCreation);
 router.post("/createLrp",authentication, spCheck, LrpCreation);
 router.post("/createFpo",authentication, spCheck, fpoCreation);
